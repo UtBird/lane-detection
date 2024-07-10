@@ -1,9 +1,5 @@
 import cv2
-import numpy as np
-import matplotlib as plt
 import process as pr
-import line_function as lf
-import forward_display as fw
 
 cap = cv2.VideoCapture('yol15.mp4')
 
