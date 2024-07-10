@@ -1,7 +1,7 @@
 import cv2
 import process as pr
 
-cap = cv2.VideoCapture('yol15.mp4')
+cap = cv2.VideoCapture('yol13.mp4')
 
 while cap.isOpened():
     ret, frame = cap.read()

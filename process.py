@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import line_function as lf 
 import forward_display as fw
+import matplotlib.pyplot as plt
 
 def process(image):
     # Resize the image
@@ -94,11 +95,27 @@ def process(image):
     
     result = np.copy(image)
     
-    for i in range(cropped_image.shape[0]):
+    # Draw the polynomial lines onto the result image
+    for i in range(len(ploty)):
         if 0 <= int(left_fitx[i]) < result.shape[1]:
-            cv2.circle(result, (int(left_fitx[i]), i), 2, (0, 255, 0), -1)
+            cv2.circle(result, (int(left_fitx[i]), int(ploty[i])), 2, (0, 255, 0), -1)
         if 0 <= int(right_fitx[i]) < result.shape[1]:
-            cv2.circle(result, (int(right_fitx[i]), i), 2, (0, 0, 255), -1)
+            cv2.circle(result, (int(right_fitx[i]), int(ploty[i])), 2, (0, 0, 255), -1)
+    
+    # Create an image to draw the lines on
+    warp_zero = np.zeros_like(cropped_image).astype(np.uint8)
+    color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+    # Recast the x and y points into usable format for cv2.fillPoly()
+    pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+    pts = np.hstack((pts_left, pts_right))
+
+    # Draw the lane onto the warped blank image
+    cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
+
+    # Combine the result with the original image
+    result = cv2.addWeighted(result, 1, color_warp, 0.3, 0)
     
     # Display the processed frame
     cv2.imshow('lines', result)
